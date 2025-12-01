@@ -4,7 +4,7 @@ services:
     container_name: banklify-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password_segreta
+      POSTGRES_PASSWORD: pgadmin
       POSTGRES_DB: banklify_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -20,14 +20,14 @@ services:
       retries: 5
 
   backend:
-    image: ghcr.io/tuo-username/nome-repo-backend:main 
+    image: ghcr.io/AFulvio1/banklify-backend:main 
     container_name: banklify-backend
     ports:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/banklify_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password_segreta
+      SPRING_DATASOURCE_PASSWORD: pgadmin
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:
@@ -36,7 +36,7 @@ services:
       - bank-network
 
   frontend:
-    image: ghcr.io/tuo-username/nome-repo-frontend:main
+    image: ghcr.io/AFulvio1/banklify-frontend:main
     container_name: banklify-frontend
     ports:
       - "3000:80"

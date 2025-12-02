@@ -1,33 +1,33 @@
 services:
   db:
-    image: postgres:15-alpine
-    container_name: banklify-db
+    image: postgres:17-alpine
+    container_name: banklify-db-demo
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pgadmin
-      POSTGRES_DB: banklify_db
+      POSTGRES_USER: banklify_user
+      POSTGRES_PASSWORD: banklifypassword
+      POSTGRES_DB: banklify-db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./dump_database.sql:/docker-entrypoint-initdb.d/init.sql
+      - banklify_demo_data:/var/lib/postgresql/data
+      - ./dump-banklify-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - bank-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U banklify_user"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   backend:
-    image: ghcr.io/AFulvio1/banklify-backend:main 
+    image: ghcr.io/afulvio1/banklify-backend:main
     container_name: banklify-backend
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/banklify_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: pgadmin
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/banklify-db
+      SPRING_DATASOURCE_USERNAME: banklify_user
+      SPRING_DATASOURCE_PASSWORD: banklifypassword
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:
@@ -36,7 +36,7 @@ services:
       - bank-network
 
   frontend:
-    image: ghcr.io/AFulvio1/banklify-frontend:main
+    image: ghcr.io/afulvio1/banklify-frontend:main
     container_name: banklify-frontend
     ports:
       - "3000:80"
@@ -46,7 +46,7 @@ services:
       - bank-network
 
 volumes:
-  postgres_data:
+  banklify_demo_data:
 
 networks:
   bank-network:
